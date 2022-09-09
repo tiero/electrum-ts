@@ -1,6 +1,12 @@
 {
   "extends": ["eslint-config-zoro/typescript", "eslint-config-zoro/eslint"],
   "parser": "@typescript-eslint/parser",
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "jest": true
+  },
   "overrides": [
     {
       "files": ["*.ts"],
@@ -12,13 +18,17 @@
       "plugins": ["@typescript-eslint"],
       "rules": {
         "indent": "off",
+        "quotes": "off",
         "brace-style": "off",
         "comma-dangle": "off",
         "no-param-reassign": "off",
         "function-paren-newline": "off",
         "@typescript-eslint/brace-style": "off",
         "@typescript-eslint/comma-dangle": "off",
-        "@typescript-eslint/no-var-requires": 0
+        "@typescript-eslint/no-var-requires": 0,
+        "@typescript-eslint/quotes": "off",
+        "@typescript-eslint/member-ordering": "off",
+        "no-use-before-define": ["off"]
       }
     }
   ]
