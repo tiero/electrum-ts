@@ -1,0 +1,46 @@
+{
+  "name": "electrum.ts",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "description": "A strictly typed Electrum client",
+  "author": "Max Karou <max@trustmachines.co>",
+  "license": "MIT",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "mocha",
+    "lint": "eslint --ext .ts src/",
+    "typescript": "tsc --noEmit",
+    "build:clean": "rm -rf dist",
+    "build:esm": "tsc -p tsconfig.build.json",
+    "build": "pnpm run build:clean && pnpm run build:esm",
+    "prepack": "pnpm run lint && pnpm run typescript && pnpm run test",
+    "prepare": "pnpm run build"
+  },
+  "homepage": "https://github.com/mxnkarou/electrum-ts#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mxnkarou/electrum-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mxnkarou/electrum-ts/issues"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.7.16",
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
+    "@typescript-eslint/parser": "^5.36.2",
+    "bumpp": "^8.2.1",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-zoro": "^5.34.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-import": "^2.26.0",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.3"
+  }
+}
