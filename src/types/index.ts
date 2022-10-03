@@ -1,38 +1,28 @@
-import type { ElectrumClient } from '../index';
+import { ElectrumClient } from '../index';
 
-export type Protocol = 'ssl' | 'tcp' | 'tls';
+export type Protocol = 'tcp' | 'tls' | 'ssl';
 
-export interface Callbacks {
+export type Callbacks = {
   onConnect?: (client: ElectrumClient, versionInfo: [string, string]) => void;
   onClose?: (client: ElectrumClient) => void;
   onLog?: (str: string) => void;
   onError?: (e: Error) => void;
-}
+};
 
-export interface PersistencePolicy {
+export type PersistencePolicy = {
   retryPeriod?: number;
   maxRetry?: number;
   pingPeriod?: number;
   callback?: (() => void) | null;
-}
+};
 
-export interface ElectrumConfig {
+export type ElectrumConfig = {
   client: string;
   version: string | [string, string];
-}
+};
 
-export type ElectrumRequestParams = Array<any[] | boolean | number | string>;
+export type ElectrumRequestParams = Array<
+  number | string | boolean | Array<any>
+>;
 
-export type ElectrumRequestBatchParams = boolean | number | string | undefined;
-
-export type BufferEncoding =
-  | 'ascii'
-  | 'base64'
-  | 'binary'
-  | 'hex'
-  | 'latin1'
-  | 'ucs-2'
-  | 'ucs2'
-  | 'utf-8'
-  | 'utf8'
-  | 'utf16le';
+export type ElectrumRequestBatchParams = number | string | boolean | undefined;

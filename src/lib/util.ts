@@ -1,5 +1,4 @@
-import type { ElectrumRequestParams } from './types';
-import type { Buffer } from 'buffer';
+import type { ElectrumRequestParams } from '../types';
 
 export const makeRequest = (
   method: string,
@@ -20,17 +19,17 @@ export const createRecursiveParser = (max_depth: number, delimiter: string) => {
   const recursiveParser = (
     n: number,
     buffer: string,
-    callback: (xs: string | undefined, x: number) => void
+    callback: (xs: string | undefined, n: number) => void
   ): { code: number; buffer: string } => {
     if (buffer.length === 0) {
-      return { code: 0, buffer };
+      return { code: 0, buffer: buffer };
     }
     if (n > MAX_DEPTH) {
-      return { code: 1, buffer };
+      return { code: 1, buffer: buffer };
     }
     const xs = buffer.split(DELIMITER);
     if (xs.length === 1) {
-      return { code: 0, buffer };
+      return { code: 0, buffer: buffer };
     }
     callback(xs.shift(), n);
     return recursiveParser(n + 1, xs.join(DELIMITER), callback);
@@ -43,11 +42,8 @@ export const createPromiseResult = (
   reject: (reason?: any) => void
 ) => {
   return (err: Error | null, result?: any) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(result);
-    }
+    if (err) reject(err);
+    else resolve(result);
   };
 };
 
@@ -56,17 +52,15 @@ export const createPromiseResultBatch = (
   reject: (reason?: any) => void,
   argz: Record<number, any>
 ) => {
-  return (err: Error | null, result?: any[]) => {
+  return (err: Error | null, result?: Array<any>) => {
     if (result && result[0] && result[0].id) {
+      // this is a batch request response
       for (const r of result) {
         r.param = argz[r.id];
       }
     }
-    if (err) {
-      reject(err);
-    } else {
-      resolve(result);
-    }
+    if (err) reject(err);
+    else resolve(result);
   };
 };
 

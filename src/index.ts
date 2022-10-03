@@ -1,5 +1,6 @@
-import { Client } from './client';
-import type {
+/* eslint-disable no-multi-assign */
+import { Client } from './lib/client';
+import {
   Callbacks,
   ElectrumConfig,
   ElectrumRequestBatchParams,
@@ -12,13 +13,12 @@ export class ElectrumClient extends Client {
   private onConnectCallback:
     | ((client: ElectrumClient, versionInfo: [string, string]) => void)
     | null;
-
   private onCloseCallback: ((client: ElectrumClient) => void) | null;
   private onLogCallback: (str: string) => void;
   private timeLastCall: number;
   private persistencePolicy: Required<PersistencePolicy>;
   private electrumConfig: ElectrumConfig | null;
-  private timeout: ReturnType<typeof setTimeout> | null;
+  private timeout: NodeJS.Timeout | null;
   versionInfo: [string, string];
 
   constructor(
@@ -78,6 +78,7 @@ export class ElectrumClient extends Client {
     return this;
   }
 
+  // Override parent
   protected async request(method: string, params: ElectrumRequestParams) {
     this.timeLastCall = Date.now();
 
@@ -112,9 +113,7 @@ export class ElectrumClient extends Client {
       'blockchain.address.subscribe',
     ];
 
-    for (const event of list) {
-      this.subscribe.removeAllListeners(event);
-    }
+    for (const event of list) this.subscribe.removeAllListeners(event);
 
     let retryPeriod = 10000;
     if (this.persistencePolicy.retryPeriod > 0) {
@@ -138,6 +137,7 @@ export class ElectrumClient extends Client {
     }, retryPeriod);
   }
 
+  // ElectrumX persistancy
   private keepAlive(): void {
     if (this.timeout != null) {
       clearTimeout(this.timeout);
@@ -153,8 +153,8 @@ export class ElectrumClient extends Client {
         this.timeLastCall !== 0 &&
         Date.now() > this.timeLastCall + pingPeriod
       ) {
-        this.server_ping().catch(() => {
-          this.log(`Keep-Alive ping failed`);
+        this.server_ping().catch((error) => {
+          this.log(`Keep-Alive ping failed: ${error}`);
         });
       }
     }, pingPeriod);
@@ -169,13 +169,10 @@ export class ElectrumClient extends Client {
 
     // eslint-disable-next-line no-multi-assign
     this.reconnect =
-      // eslint-disable-next-line no-multi-assign
       this.reconnect =
-      // eslint-disable-next-line no-multi-assign
       this.onClose =
-      // eslint-disable-next-line no-multi-assign
       this.keepAlive =
-        () => Promise.resolve(this);
+        () => Promise.resolve(this); // dirty hack to make it stop reconnecting
   }
 
   private reconnect(): Promise<ElectrumClient> {
@@ -193,6 +190,7 @@ export class ElectrumClient extends Client {
     this.onLogCallback(str);
   }
 
+  // ElectrumX API
   server_version(
     client_name: string,
     protocol_version: string | [string, string]
@@ -300,6 +298,9 @@ export class ElectrumClient extends Client {
     return this.request('mempool.get_fee_histogram', []);
   }
 
+  // ---------------------------------
+  // protocol 1.1 deprecated method
+  // ---------------------------------
   blockchainUtxo_getAddress(tx_hash: string, index: number) {
     return this.request('blockchain.utxo.get_address', [tx_hash, index]);
   }
@@ -308,6 +309,9 @@ export class ElectrumClient extends Client {
     return this.request('blockchain.numblocks.subscribe', []);
   }
 
+  // ---------------------------------
+  // protocol 1.2 deprecated method
+  // ---------------------------------
   blockchainBlock_getChunk(index: number) {
     return this.request('blockchain.block.get_chunk', [index]);
   }

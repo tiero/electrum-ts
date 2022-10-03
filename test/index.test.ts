@@ -6,12 +6,29 @@ import { ElectrumClient } from '../src';
 let tcpClient: ElectrumClient;
 let tlsClient: ElectrumClient;
 
-beforeAll(() => {
+/*
+const callbacks = {
+    onConnect: (_: any, versionInfo: any) => {
+        console.log('client connect', versionInfo)
+    },
+    onLog: (msg: any) => {
+        console.log('client log', msg)
+    },
+    onError: (err: any) => {
+        console.error('client error', err)
+    },
+    onClose: () => {
+        console.log('client: Connection closed')
+    }
+}
+ */
+
+before(() => {
   tcpClient = new ElectrumClient(60001, 'btc.electroncash.dk', 'tcp');
   tlsClient = new ElectrumClient(60002, 'btc.electroncash.dk', 'tls');
 });
 
-afterAll(() => {
+after(() => {
   tcpClient.close();
   tlsClient.close();
 });
@@ -43,7 +60,7 @@ describe('ElectrumClient TCP', () => {
       'f08474320cb16c34bb6ccbd8ca77b41168589155e8cf0af787d8d8b2a975af0b',
     ]);
 
-    assert.equal(response, [
+    assert.deepStrictEqual(response, [
       {
         id: 3,
         jsonrpc: '2.0',
@@ -64,7 +81,7 @@ describe('ElectrumClient TCP', () => {
   });
 
   it('should make a request after reconnection', (done) => {
-    // @ts-ignore
+    // @ts-ignore Hijack Typescript to call method on private field in order to simulate connection close
     tcpClient.conn?.end();
     setTimeout(async () => {
       const res = await tcpClient.server_banner();
