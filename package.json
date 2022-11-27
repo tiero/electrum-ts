@@ -1,5 +1,5 @@
 {
-  "name": "electrum.ts",
+  "name": "electrum-ts",
   "version": "0.0.1",
   "engines": {
     "node": ">=14.0.0"
